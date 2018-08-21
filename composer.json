@@ -1,0 +1,8 @@
+{
+    "name": "Emmanurl slim framework",
+    "description": "MVC with vanilla php - RESTAPI",
+    "type": "project",
+    "require": {
+        "paragonie/easydb": "^2"
+    }
+}
