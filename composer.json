@@ -1,5 +1,5 @@
 {
-    "name": "Emmanurl slim framework",
+    "name": "Emmanuel slim framework",
     "description": "MVC with vanilla php - RESTAPI",
     "type": "project",
     "require": {
