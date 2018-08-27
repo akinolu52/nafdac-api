@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "00716f0bfb95ab100877c5e3b13dff96",
+    "content-hash": "02405daf7ef54bd89a42b09cee393da0",
     "packages": [
         {
             "name": "paragonie/easydb",
