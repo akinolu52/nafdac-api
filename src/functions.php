@@ -1,6 +1,7 @@
 <?php
 function router($httpMethods, $route, $callback, $exit = true)
 {
+    // die($_SERVER['REQUEST_METHOD']);
     static $path = null;
     if ($path === null) {
         $path = parse_url($_SERVER['REQUEST_URI'])['path'];
@@ -11,26 +12,42 @@ function router($httpMethods, $route, $callback, $exit = true)
             $path = substr($path, $len);
         }
     }
-    if (!in_array($_SERVER['REQUEST_METHOD'], (array) $httpMethods)) {
-        return;
-    }
-    $matches = null;
-    $regex = '/' . str_replace('/', '\/', $route) . '/';
-    if (!preg_match_all($regex, $path, $matches)) {
-        return;
-    }
-    if (empty($matches)) {
-        $callback();
-    } else {
-        $params = array();
-        foreach ($matches as $k => $v) {
-            if (!is_numeric($k) && !isset($v[1])) {
-                $params[$k] = $v[0];
-            }
-        }
-        $callback($params);
-    }
-    if ($exit) {
+    if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+        echo json_encode('true');
         exit;
     }
+    else if (!in_array($_SERVER['REQUEST_METHOD'], (array) $httpMethods)) {
+        return;
+    }
+    else {
+        $matches = null;
+        $regex = '/' . str_replace('/', '\/', $route) . '/';
+        if (!preg_match_all($regex, $path, $matches)) {
+            return;
+        }
+        if (empty($matches)) {
+            $callback();
+        } else {
+            $params = array();
+            foreach ($matches as $k => $v) {
+                if (!is_numeric($k) && !isset($v[1])) {
+                    $params[$k] = $v[0];
+                }
+            }
+            $callback($params);
+        }
+        if ($exit) {
+            exit;
+        }
+    }
+    
+}
+
+function getInput() {
+    if ($_POST) {
+        $json = $_POST;
+    } else {
+        $json = json_decode(file_get_contents('php://input'), true);
+    }
+    return $json;
 }

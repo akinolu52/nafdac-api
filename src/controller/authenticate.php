@@ -5,20 +5,17 @@ header('Content-Type: application/json');
 
 function login() {
     $db = connect();
-    extract($_POST);
+    $input = getInput();
+    extract($input);
     try {
-        $userData = $db->run('SELECT * FROM users WHERE email = ? AND password = ?', $email, $password);
+        $userData = $db->run('SELECT email,name,id FROM users WHERE email = ? AND password = ?', $email, $password);
 
-        if(!empty($userData)) {
-            $userData->token = apiToken($userData->id);
-        }
-        
         $db = null;
         if($userData){
-            $userData = json_encode($userData);
-            echo '{"userData": ' .$userData . '}';
+            $userData{0}['token'] = apiToken($userData{0}['id']);
+            echo json_encode($userData{0});
         } else {
-            echo '{"error":{"text":"Wrong username and password"}}';
+            echo '{"error":{"text":"Wrong email and password"}}';
         }
     }
     catch(PDOException $e) {
@@ -28,10 +25,11 @@ function login() {
 
 function register() {
     $db = connect();
-    extract($_POST);
+    $input = getInput();
+    extract($input);
     try {
         $email_check = preg_match('~^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.([a-zA-Z]{2,4})$~i', $email);
-        $password_check = preg_match('~^[A-Za-z0-9!@#$%^&*()_]{6,20}$~i', $password);
+        $password_check = preg_match('~^[A-Za-z0-9!@#$%^&*()_]{3,20}$~i', $password);
 
         if (strlen(trim($password))>0 && strlen(trim($email))>0 && $email_check>0 && $password_check>0) {
             $stmt = $db->run("SELECT id FROM users WHERE email= ?", $email);
@@ -56,7 +54,7 @@ function register() {
             if($userData){
                 echo $userData = json_encode($userData);
             } else {
-                echo '{"error":{"text":"Enter valid data"}}';
+                echo '{"error":{"text":"Error"}}';
             }
         }
         else{

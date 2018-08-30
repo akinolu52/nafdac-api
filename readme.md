@@ -16,6 +16,6 @@
 
 # google calendar endpoint
 
-
-#### start server with: php -S localhost:8000 api.php
+#### cd public
+#### start server with: php -S localhost:8080
 
