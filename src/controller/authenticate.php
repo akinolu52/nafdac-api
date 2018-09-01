@@ -12,7 +12,8 @@ function logout() {
 
         if($userData){
             $db->update('users', [
-                'token' => NULL
+                'token' => NULL,
+                'updated_at' => date('Y-m-d H:i:s')
             ], [
                 'id' => $userData[0]['id']
             ]);
@@ -40,7 +41,8 @@ function login() {
             // save the token
 
             $db->update('users', [
-                'token' => $token
+                'token' => $token,
+                'updated_at' => date('Y-m-d H:i:s')
             ], [
                 'id' => $id
             ]);

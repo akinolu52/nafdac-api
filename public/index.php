@@ -43,7 +43,7 @@ router(['POST', 'OPTIONS'], '^/register$', 'register');
 // all product
 router(['GET', 'OPTIONS'], '^/products/all$', 'all');
 
-// single product
+// single product - product id
 router(['GET', 'OPTIONS'], '^/products/(?<id>\d+)$', 'single');
 
 // create product
@@ -51,6 +51,13 @@ router(['POST', 'OPTIONS'], '^/products/create$', 'create');
 
 // my product
 router(['GET', 'OPTIONS'], '^/products/mine$', 'index');
+
+// search product
+router(['GET', 'OPTIONS'], '^/product/search/(?<q>[a-zA-z]+)$', 'search');
+// function($params) {
+//     echo "You selected User-ID: ";
+//     var_dump($params);
+// });
 
 
 header("HTTP/1.0 404 Not Found");

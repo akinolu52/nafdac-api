@@ -8,15 +8,13 @@ header('Content-Type: application/json');
 // all products
 function all() {
     $db = connect();
-    $input = getInput();
-    extract($input);
     try {
         $products = $db->run('SELECT * FROM products');
         $db = null;
-        if($userData){
+        if($products){
             echo json_encode($products);
         } else {
-            echo json_encode('false');
+            echo json_encode(false);
         }
     }
     catch(PDOException $e) {
@@ -24,7 +22,25 @@ function all() {
     }
 }
 
-// create a nnew product
+// search 
+function search($nafdac_no) {
+    $q = $nafdac_no['q'];
+    $db = connect();
+    try {
+        $query = $db->run("SELECT * FROM products WHERE nafdac_no = ? OR name = ?", $q, $q);
+        $db = null;
+        if($query){
+            echo json_encode($query);
+        } else {
+            echo json_encode(false);
+        }
+    }
+    catch(PDOException $e) {
+       echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+// create a new product
 function create() {
     $user = getUser($_SERVER['HTTP_X_TOKEN'])[0];
     if($user === false) {
@@ -35,11 +51,14 @@ function create() {
     $input = getInput();
     extract($input);
     try {
+        // generate nafdac_number
+        // work on image
         $db->insert('products', [
             'user_id' => $user['id'],
             'name' => $name,
             'description' => $description,
             'image' => $image,
+            // 'nafdac' => ,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);
