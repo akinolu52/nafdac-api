@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL & ~ E_NOTICE);
 
 require_once __DIR__ . '/../database.php';
 require_once __DIR__ . '/authenticate.php';
@@ -48,7 +49,7 @@ function create() {
        
     }
     catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}';
+        echo json_encode(false);
     }
 }
 
@@ -61,8 +62,8 @@ function index() {
     }
     $db = connect();
     try {
-        $stmt = $db->run("SELECT * FROM products WHERE id= ?", $user['id']);
-        
+        $stmt = $db->run("SELECT * FROM products WHERE user_id= ?", $user['id']);
+        // print_r($stmt);
         $db = null;
         if($stmt){
             echo json_encode($stmt);
