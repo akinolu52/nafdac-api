@@ -7,8 +7,6 @@ function logout() {
     $db = connect();
     $input = getInput();
     extract($input);
-    // print_r($input);
-    // die();
     try {
         $userData = $db->run('SELECT * FROM users WHERE email = ? AND token = ?', $email, $token);
 
@@ -82,12 +80,12 @@ function register() {
                 $userData->name = $name;
 
                 $stmt = $db->run("SELECT email,name,id,role FROM users WHERE email= ?", $email);
-                $userData->token = apiToken($stmt->id);
+                $userData->token = apiToken($stmt[0]['id']);
                 // save the token
                 $db->update('users', [
                     'token' => $userData->token
                 ], [
-                    'id' => $userData->id
+                    'id' => $stmt[0]['id']
                 ]);
             }
             $db = null;
