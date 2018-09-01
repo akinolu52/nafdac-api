@@ -1,25 +1,19 @@
 <?php
 
 require_once __DIR__ . '/../database.php';
+require_once __DIR__ . '/authenticate.php';
 header('Content-Type: application/json');
 
-function logout() {
+// all products
+function all() {
     $db = connect();
     $input = getInput();
     extract($input);
-    // print_r($input);
-    // die();
     try {
-        $userData = $db->run('SELECT * FROM users WHERE email = ? AND token = ?', $email, $token);
-
+        $products = $db->run('SELECT * FROM products');
+        $db = null;
         if($userData){
-            $db->update('users', [
-                'token' => NULL
-            ], [
-                'id' => $userData[0]['id']
-            ]);
-            $db = null;
-            echo json_encode(true);
+            echo json_encode($products);
         } else {
             echo json_encode('false');
         }
@@ -29,35 +23,60 @@ function logout() {
     }
 }
 
-function login() {
+// create a nnew product
+function create() {
+    $user = getUser($_SERVER['HTTP_X_TOKEN'])[0];
+    if($user === false) {
+        echo json_encode(false);
+        die;
+    }
     $db = connect();
     $input = getInput();
     extract($input);
     try {
-        $userData = $db->run('SELECT email,name,id,role FROM users WHERE email = ? AND password = ?', $email, $password);
+        $db->insert('products', [
+            'user_id' => $user['id'],
+            'name' => $name,
+            'description' => $description,
+            'image' => $image,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
         
-        if($userData){
-            $id = $userData{0}['id'];
-            $token = $userData{0}['token'] = apiToken($id);
-            // save the token
-
-            $db->update('users', [
-                'token' => $token
-            ], [
-                'id' => $id
-            ]);
-            $db = null;
-            echo json_encode($userData{0});
-        } else {
-            echo '{"error":{"text":"Wrong email and password"}}';
-        }
+        $db = null;
+        echo json_encode(true);
+       
     }
     catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
 }
 
-function register() {
+// user all products
+function index() {
+    $user = getUser($_SERVER['HTTP_X_TOKEN'])[0];
+    if($user === false) {
+        echo json_encode(false);
+        die;
+    }
+    $db = connect();
+    try {
+        $stmt = $db->run("SELECT * FROM products WHERE id= ?", $user['id']);
+        
+        $db = null;
+        if($stmt){
+            echo json_encode($stmt);
+        } else {
+            echo json_encode(false);
+        }
+    }
+    catch(PDOException $e) {
+       echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+// single product
+function single() {
     $db = connect();
     $input = getInput();
     extract($input);
@@ -103,22 +122,5 @@ function register() {
     }
     catch(PDOException $e) {
        echo '{"error":{"text":'. $e->getMessage() .'}}';
-    }
-}
-
-function getUser($token){
-    try {
-        $db = connect();
-        $userData = $db->run('SELECT email,name,id,role FROM users WHERE token = ? ', $token);
-        
-        $db = null;
-        if($userData){
-            return $userData;
-        } else {
-            return false;
-        }
-    }
-    catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
 }
